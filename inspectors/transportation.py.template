@@ -1,0 +1,58 @@
+#!/usr/bin/env python
+
+from utils import utils, inspector
+
+# Copy this file into inspectors, and rename it to [inspector].py,
+# where [inspector] is an unclaimed handle for an IG office,
+#   e.g. "usps.py" for the USPS OIG.
+# Use this handle for the 'inspector' field on report dicts.
+
+# This script's "run" function will be run.
+# You can do anything you want that eventually results in calling:
+#
+#   inspector.save_report(report)
+#
+# Where report is a dict with the following required fields:
+#
+#   inspector: the handle you chose for the IG, e.g. "usps"
+#   agency: the agency the report relates to.
+#           This can be the same value as the inspector field, but it
+#           may differ -- some IGs monitor multiple agencies.
+#   report_id: a unique ID for the report
+#   title: title of report
+#   url: link to report
+#   published_on: date of publication
+#   year: year of publication
+#   file_type: 'pdf' or other file extension
+#
+# Any additional fields are fine, and will be kept.
+
+def run(options):
+
+  # Suggested flow, for an IG which paginates results.
+  pages = options.get('pages', 1)
+
+  for page in range(1, (int(pages) + 1)):
+    url = url_for(options, page)
+    body = utils.download(url)
+
+    # Suggested parser, Beautiful Soup 4.
+    doc = BeautifulSoup(body)
+    results = doc.select("some-selector")
+
+    for result in results:
+      report = report_from(result)
+      inspector.save_report(report)
+
+
+# suggested: construct URL based on options
+def url_for(options, page = 1):
+  pass
+
+# suggested: a function that gets report details from a parent element,
+# extract a dict of details that are ready for inspector.save_report().
+def report_from(result):
+  pass
+
+
+utils.run(run)
